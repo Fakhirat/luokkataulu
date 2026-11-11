@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f1e7">
+<title>Luokan taulu – opettaja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<style>
+/* Layout: phone-first editor — header with class name, one scrolling section per tab, tab bar pinned to the bottom. */
+:root{
+  --bg:#f6f1e7; --panel:#fffdf8; --ink:#1f2933; --muted:#6c6a63; --line:#e7dfcf;
+  --accent:#e2582b; --accent-ink:#fff; --accent-soft:#fde4d8; --teal:#1f7a85; --danger:#b4321d; --ok:#2f8a4e;
+  --s1:#ffd9cc; --s2:#cfe3ff; --s3:#ffe7a8; --s4:#cdeec9; --s5:#e6d6f5; --s6:#c6ece6; --s7:#ffd3e6; --s8:#e9e0cf; --lunch:#ffe1b0; --break:#e4ecef; --chip-ink:#1f2933;
+  --display:"Fredoka","Segoe UI",system-ui,sans-serif; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13171c; --panel:#1b2128; --ink:#eef0ea; --muted:#9aa3a8; --line:#2c343d;
+  --accent:#ff8a5c; --accent-ink:#1b1410; --accent-soft:#3a2219; --teal:#5cc2cc; --danger:#ff8c78; --ok:#6fd08f;
+  --s1:#e8b3a3; --s2:#a8c6ef; --s3:#ecd27f; --s4:#a9d6a3; --s5:#c9b4e2; --s6:#9fd6cc; --s7:#eab2ca; --s8:#cdbfa6; --lunch:#ebc27e; --break:#3a444d; --chip-ink:#13171c;
+  color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{padding:max(14px,env(safe-area-inset-top,0px)) 16px 8px;display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
+header h1{font-family:var(--display);font-weight:600;font-size:24px;margin:0;flex:1;min-width:0}
+header .sub{color:var(--muted);font-size:14px}
+main{padding:0 16px;max-width:760px;margin:0 auto}
+section{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0;display:flex;align-items:center;gap:8px}
+.card h2 .n{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+label,.flabel{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%;min-width:0}
+textarea{min-height:80px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;align-items:center;gap:10px;font-size:16px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400;min-height:44px}
+.check input{width:22px;height:22px;min-height:0;accent-color:var(--accent)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:10px 16px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.items{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:none}
+.item .t{white-space:pre-wrap;overflow-wrap:anywhere}
+.item .m{font-size:13px;color:var(--muted)}
+.item .b{display:flex;gap:6px}
+.chip{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:18px;color:var(--chip-ink)}
+.imp{color:var(--danger);font-weight:700}
+.empty{color:var(--muted);margin:0}
+.hint{color:var(--muted);font-size:14px;margin:0;line-height:1.45}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.day{border:1px solid var(--line);background:var(--panel);border-radius:999px;min-width:48px;min-height:44px;padding:6px 12px;font-weight:700}
+.day[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.slot{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center}
+.slot .tm{font-variant-numeric:tabular-nums;font-weight:700}
+.slot .tm small{display:block;color:var(--muted);font-weight:400}
+.bell{display:grid;grid-template-columns:28px 1fr 1fr 44px;gap:8px;align-items:center}
+.bell .nr{color:var(--muted);font-weight:700;text-align:center}
+.x{border:none;background:none;width:44px;height:44px;border-radius:50%;color:var(--danger);font-size:20px}
+.menuday{display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:start;padding-top:10px;border-top:1px solid var(--line)}
+.menuday:first-of-type{border-top:none;padding-top:0}
+.menuday .d{font-weight:700;padding-top:10px}
+.menuday .d small{display:block;color:var(--muted);font-weight:400}
+.menuday .f{display:flex;flex-direction:column;gap:6px}
+.wknav{display:flex;align-items:center;gap:8px}
+.wknav b{flex:1;text-align:center}
+.duty{display:flex;gap:8px;flex-wrap:wrap}
+.duty span{background:var(--s6);color:var(--chip-ink);border-radius:10px;padding:6px 12px;font-weight:700;font-family:var(--display);font-size:18px}
+.places{display:flex;flex-direction:column;gap:6px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.tabbar button{border:none;background:none;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;color:var(--muted);font-weight:700}
+.tabbar button .e{font-size:22px}
+.tabbar button[aria-selected="true"]{color:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(15,20,25,.55);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.sheet{background:var(--panel);border-radius:16px;width:min(480px,100%);padding:20px;display:flex;flex-direction:column;gap:14px}
+.sheet h3{font-family:var(--display);font-size:22px;margin:0}
+.err{color:var(--danger);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;z-index:30;font-size:15px;max-width:calc(100% - 32px);text-align:center}
+.banner{background:var(--accent-soft);border-radius:12px;padding:10px 14px;font-size:15px}
+.toggle{display:flex;align-items:center;gap:14px}
+.toggle .st{flex:1;font-family:var(--display);font-weight:600;font-size:22px}
+.toggle .st small{display:block;font-family:var(--body);font-weight:400;font-size:14px;color:var(--muted)}
+.btn.big{min-height:56px;padding:12px 22px;font-size:18px}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:700}
+.showing{background:var(--s4);color:var(--chip-ink);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;margin-left:6px;white-space:nowrap}
+.preview{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.preview img{max-width:160px;max-height:120px;border-radius:10px;border:1px solid var(--line);object-fit:cover}
+.moodrow{display:grid;grid-template-columns:1fr;gap:4px;padding:10px 0;border-top:1px solid var(--line)}
+.moodrow:first-child{border-top:none}
+.moodbar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--line)}
+.moodbar i{display:flex;align-items:center;justify-content:center;font-size:12px;font-style:normal;color:var(--chip-ink);min-width:0;overflow:hidden}
+.mlegend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+[hidden]{display:none!important}
+@media (min-width:640px){ .two{display:grid;grid-template-columns:1fr 1fr;gap:12px} }
+@media (max-width:520px){ .item{grid-template-columns:auto 1fr} .item .b{grid-column:2} }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Luokan taulu</h1>
+  <span class="sub" id="sync"></span>
+</header>
+<main>
+  <div class="banner" id="banner" hidden></div>
+
+  <!-- ILMOITUKSET -->
+  <section id="tab-info">
+    <div class="card">
+      <h2>📣 Tiedotteet <span class="n" id="ntCount"></span></h2>
+      <div class="items" id="ntList"></div>
+      <div class="field"><label for="ntText">Uusi tiedote</label><textarea id="ntText" maxlength="300" placeholder="esim. Huomenna valokuvaus – muista hymy!"></textarea></div>
+      <div class="row2">
+        <div class="field"><label for="ntUntil">Näkyy asti (valinnainen)</label><input id="ntUntil" type="date"></div>
+        <label class="check"><input type="checkbox" id="ntImp"> Tärkeä</label>
+      </div>
+      <div class="actions"><button class="btn" type="button" id="ntCancel" hidden>Peruuta</button><button class="btn primary" type="button" id="ntSave">Lisää tiedote</button></div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Läksyt <span class="n" id="hwCount"></span></h2>
+      <div class="items" id="hwList"></div>
+      <div class="row2">
+        <div class="field"><label for="hwSubj">Aine</label><input id="hwSubj" list="subjects" maxlength="40" placeholder="Matematiikka"></div>
+        <div class="field"><label for="hwDue">Mihin mennessä</label><input id="hwDue" type="date"></div>
+      </div>
+      <div class="field"><label for="hwText">Läksy</label><textarea id="hwText" maxlength="300" placeholder="esim. s. 42 tehtävät 1–4"></textarea></div>
+      <div class="actions"><button class="btn" type="button" id="hwCancel" hidden>Peruuta</button><button class="btn primary" type="button" id="hwSave">Lisää läksy</button></div>
+    </div>
+
+    <div class="card">
+      <h2>📌 Tapahtumat <span class="n" id="evCount"></span></h2>
+      <div class="items" id="evList"></div>
+      <div class="row2">
+        <div class="field"><label for="evDate">Päivä</label><input id="evDate" type="date"></div>
+        <div class="field"><label for="evTime">Kello (valinnainen)</label><input id="evTime" type="time"></div>
+      </div>
+      <div class="field"><label for="evText">Mitä</label><input id="evText" maxlength="80" placeholder="esim. Retki luontokeskukseen"></div>
+      <label class="check"><input type="checkbox" id="evCd"> ⏳ Näytä lähtölaskenta taululla</label>
+      <p class="hint">Ilman kellonaikaa tapahtuma näkyy koko päivän nostona päivän ohjelman yläpuolella.</p>
+      <div class="actions"><button class="btn" type="button" id="evCancel" hidden>Peruuta</button><button class="btn primary" type="button" id="evSave">Lisää tapahtuma</button></div>
+    </div>
+  </section>
+
+  <!-- TUNTI -->
+  <section id="tab-teach" hidden>
+    <div class="card">
+      <h2>🎓 Opetustila</h2>
+      <div class="toggle"><div class="st" id="tcState">Pois päältä<small>Taulu näyttää tavallisen näkymän.</small></div><button class="btn big" type="button" id="tcToggle">Kytke päälle</button></div>
+      <p class="hint" id="tcCard"></p>
+      <label class="check"><input type="checkbox" id="tcAuto"> Kytke päälle automaattisesti oppituntien ajaksi (ei ruokailussa eikä välitunnilla)</label>
+      <p class="hint">Opetustilassa taululla näkyy vain tunti, tehtäväkortti, ajastin ja äänitaso. Muutos näkyy taululla noin 15 sekunnissa.</p>
+    </div>
+
+    <div class="card">
+      <h2>📋 Tuntiohjeet <span class="n" id="lsCount"></span></h2>
+      <div class="items" id="lsList"></div>
+    </div>
+
+    <div class="card" id="lsForm">
+      <h2 id="lsFormH">Uusi tuntiohje</h2>
+      <div class="field"><label for="lsTitle">Otsikko</label><input id="lsTitle" maxlength="80" placeholder="esim. Murtoluvut pizzan avulla"></div>
+      <div class="row2">
+        <div class="field"><label for="lsSubj">Aine</label><input id="lsSubj" list="subjects" maxlength="40" placeholder="Matematiikka"></div>
+        <div class="field"><label for="lsMode">Työtapa</label><select id="lsMode"></select></div>
+      </div>
+      <div class="field"><label for="lsGoal">Tänään opimme (valinnainen)</label><input id="lsGoal" maxlength="140" placeholder="esim. vertaamaan murtolukuja"></div>
+      <div class="field"><label for="lsSteps">Ohjeet, yksi vaihe per rivi</label><textarea id="lsSteps" rows="5" maxlength="1500" placeholder="Avaa kirja sivulta 54&#10;Tee tehtävät 1–3 vihkoon&#10;Tarkista parin kanssa"></textarea></div>
+      <div class="field"><label for="lsExtra">Valmis? Lisätehtävä (valinnainen)</label><input id="lsExtra" maxlength="200" placeholder="esim. Keksi oma murtolukutehtävä parille"></div>
+      <div class="field"><span class="flabel">Kuva (valinnainen)</span>
+        <div class="preview" id="lsPreview"></div>
+        <label class="btn" for="lsFile" style="align-self:flex-start;text-transform:none;letter-spacing:0;font-size:16px;color:var(--ink);font-weight:400">📷 Valitse tai ota kuva</label>
+        <input id="lsFile" type="file" accept="image/*" hidden>
+      </div>
+      <div class="actions"><button class="btn" type="button" id="lsCancel" hidden>Peruuta</button><button class="btn" type="button" id="lsSave">Tallenna</button><button class="btn primary" type="button" id="lsSaveShow">Tallenna ja näytä taululla</button></div>
+    </div>
+
+    <div class="card">
+      <h2>😊 Fiilismittari</h2>
+      <div class="mlegend"><span>😄 tosi kiva</span><span>🙂 ihan hyvä</span><span>😐 niin ja näin</span><span>🙁 vaikea tai tylsä</span></div>
+      <div id="mdList"></div>
+    </div>
+  </section>
+
+  <!-- RUOKA -->
+  <section id="tab-food" hidden>
+    <div class="card">
+      <div class="wknav"><button class="btn small" type="button" id="fdPrev" aria-label="Edellinen viikko">‹</button><b id="fdWeek"></b><button class="btn small" type="button" id="fdNext" aria-label="Seuraava viikko">›</button></div>
+      <div id="fdDays"></div>
+      <div class="actions"><button class="btn primary" type="button" id="fdSave">Tallenna viikon ruokalista</button></div>
+    </div>
+    <div class="card">
+      <h2>📋 Liitä teksti</h2>
+      <p class="hint">Kopioi viikon ruokalista koulun sivulta ja liitä se tähän. Täytän päivät valmiiksi, ja voit korjata ne ennen tallennusta.</p>
+      <textarea id="fdPaste" placeholder="Maanantai 16.11.&#10;Kalakeitto&#10;Kasvisruoka: Bataattikeitto&#10;Tiistai 17.11.&#10;…"></textarea>
+      <div class="actions"><button class="btn" type="button" id="fdParse">Täytä viikko</button></div>
+    </div>
+  </section>
+
+  <!-- LUKKARI -->
+  <section id="tab-tt" hidden>
+    <div class="card">
+      <h2>🗓️ Lukujärjestys</h2>
+      <div class="days" id="ttDays"></div>
+      <div id="ttSlots" class="items"></div>
+      <p class="hint">Jätä tyhjäksi, jos tunnilla ei ole opetusta. Kirjoita <b>Ruokailu</b>, niin taulu näyttää sen omalla kuvakkeella. Välitunnit näkyvät taululla itsestään tuntien väleissä.</p>
+      <div class="actions"><button class="btn" type="button" id="ttCopy">Kopioi edellinen päivä</button><button class="btn primary" type="button" id="ttSave">Tallenna</button></div>
+    </div>
+    <div class="card">
+      <h2>🔔 Tuntien kellonajat</h2>
+      <div id="bells" class="items"></div>
+      <div class="actions"><button class="btn" type="button" id="bellAdd">+ Lisää tunti</button><button class="btn primary" type="button" id="bellSave">Tallenna kellonajat</button></div>
+    </div>
+  </section>
+
+  <!-- LUOKKA -->
+  <section id="tab-class" hidden>
+    <div class="card">
+      <h2>🏫 Luokka</h2>
+      <div class="field"><label for="clName">Luokan nimi</label><input id="clName" maxlength="20" placeholder="esim. 5B"></div>
+      <div class="field"><label for="clStudents">Oppilaiden etunimet, yksi per rivi</label><textarea id="clStudents" rows="8" placeholder="Aino&#10;Eetu&#10;…"></textarea></div>
+      <p class="hint">Järjestäjät kiertävät tässä järjestyksessä. Jos kahdella on sama etunimi, lisää perään kirjain, esim. "Aino K".</p>
+      <div class="row2">
+        <div class="field"><label for="dtSize">Järjestäjiä kerralla</label><select id="dtSize"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <div class="field"><label for="dtMode">Vuoro vaihtuu</label><select id="dtMode"><option value="week">viikoittain</option><option value="day">päivittäin</option></select></div>
+      </div>
+      <div class="field"><label for="clBdays">Syntymäpäivät, yksi per rivi (valinnainen)</label><textarea id="clBdays" rows="4" placeholder="Aino 14.3.&#10;Eetu 2.12."></textarea></div>
+      <p class="hint">Taululla näkyy onnittelu syntymäpäivänä ja tulevat syntymäpäivät kaksi viikkoa etukäteen. Vuotta ei tarvita.</p>
+      <div class="field"><label for="clHome">Kotiinlähtömuistutus, yksi asia per rivi (valinnainen)</label><textarea id="clHome" rows="3" placeholder="Tarkista, että reppu on mukana&#10;Lukuläksy joka ilta 15 min"></textarea></div>
+      <p class="hint">Muistutus näkyy taululla viimeisen tunnin lopussa. Siihen tulevat itsestään myös huomisen läksyt ja tapahtumat sekä liikuntavaatteet, jos huomenna on liikuntaa.</p>
+      <label class="check"><input type="checkbox" id="clVisual"> Kuvatuki: isommat kuvat päivän ohjelmassa</label>
+      <div class="actions"><button class="btn primary" type="button" id="clSave">Tallenna</button></div>
+    </div>
+    <div class="card">
+      <h2>🧹 Järjestäjät nyt</h2>
+      <div class="duty" id="dtNow"></div>
+      <div class="actions"><button class="btn" type="button" id="dtBack">‹ Edelliset</button><button class="btn" type="button" id="dtFwd">Seuraavat ›</button></div>
+      <p class="hint">Siirrä vuoroa, jos joku oli poissa tai vuoro meni ohi lomalla.</p>
+    </div>
+    <div class="card">
+      <h2>🌤️ Sään paikkakunta</h2>
+      <p class="hint" id="plNow"></p>
+      <div class="field"><label for="plSearch">Hae paikkakunta</label><input id="plSearch" placeholder="esim. Turku tai Kaarina" autocomplete="off"></div>
+      <div class="places" id="plResults"></div>
+    </div>
+    <div class="card">
+      <h2>🔑 Tämä laite</h2>
+      <p class="hint">Luokan näyttö avataan osoitteesta, jossa on <b>index.html</b>. Sinne syötetään näytön avain, ei opettajan avainta.</p>
+      <div class="actions"><button class="btn danger" type="button" id="forget">Unohda opettajan avain</button></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" role="tablist">
+  <button role="tab" data-tab="info" aria-selected="true"><span class="e">📣</span>Ilmoitukset</button>
+  <button role="tab" data-tab="teach" aria-selected="false"><span class="e">🎓</span>Tunti</button>
+  <button role="tab" data-tab="food" aria-selected="false"><span class="e">🍽️</span>Ruoka</button>
+  <button role="tab" data-tab="tt" aria-selected="false"><span class="e">🗓️</span>Lukkari</button>
+  <button role="tab" data-tab="class" aria-selected="false"><span class="e">🏫</span>Luokka</button>
+</nav>
+<datalist id="subjects"></datalist>
+<div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var L=LT,$=function(s){return document.querySelector(s);},esc=L.esc;
+var S={notices:[],homework:[],events:[],menu:[],lessons:[],mood:[],teach:{on:false,lessonId:"",auto:false},settings:L.withDefaults({}),loaded:false};
+var ED={nt:null,hw:null,ev:null,ls:null};   // muokattavana oleva rivi
+var ttDay=Math.min(L.dow(new Date()),4),fdWeek=0,bellsDraft=null,bellsDirty=false;
+
+function key(){return L.lsGet("lt-teacher-key","");}
+function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true;},2800);}
+function today(){var d=new Date();d.setHours(0,0,0,0);return d;}
+
+/* ---------- backend ---------- */
+function apply(j){
+  S.notices=j.notices||[];S.homework=j.homework||[];S.events=j.events||[];S.menu=j.menu||[];
+  S.lessons=j.lessons||[];S.mood=j.mood||[];if(j.teach)S.teach=j.teach;
+  S.settings=L.withDefaults(j.settings);S.loaded=true;
+  $("#sync").textContent="✓ tallessa";
+  renderAll();
+}
+function load(){
+  if(!L.configured()){banner("Taustapalvelun osoite puuttuu config.js-tiedostosta. Katso asennusohje.");return Promise.resolve();}
+  if(!key()){askKey();return Promise.resolve();}
+  $("#sync").textContent="Haetaan…";
+  return L.getAll(key()).then(function(j){
+    if(j.role!=="teacher"){askKey(false,"Tämä on luokan näytön avain. Opettajan näkymään tarvitaan opettajan avain.");return;}
+    apply(j);
+  }).catch(function(e){$("#sync").textContent="";if(e.message==="key")askKey(true);else banner(L.errText(e));});
+}
+function send(body,msg){
+  $("#sync").textContent="Tallennetaan…";
+  return L.post(key(),body).then(function(j){apply(j);if(msg)toast(msg);return j;})
+    .catch(function(e){$("#sync").textContent="⚠️ ei tallennettu";toast(L.errText(e));if(e.message==="key"||e.message==="readonly")askKey(true);throw e;});
+}
+function saveSettings(patch,msg){var v=L.clone(S.settings);for(var k in patch)v[k]=patch[k];return send({op:"settings",value:v},msg);}
+function banner(t){var b=$("#banner");b.textContent=t;b.hidden=!t;}
+
+function askKey(wrong,why){
+  var o=$("#overlay");o.hidden=false;
+  $("#sheet").innerHTML='<h3>Opettajan avain</h3><p class="hint">Syötä Code.gs-tiedoston <b>OPETTAJAN_AVAIN</b>. Tämä laite muistaa sen.</p>'+
+    (wrong?'<p class="err">Avain ei kelpaa.</p>':"")+(why?'<p class="err">'+esc(why)+'</p>':"")+
+    '<input id="kIn" type="password" autocomplete="current-password" aria-label="Opettajan avain"><div class="actions"><button class="btn primary" type="button" id="kGo">Jatka</button></div>';
+  var go=function(){var v=$("#kIn").value.trim();if(!v)return;L.lsSet("lt-teacher-key",v);o.hidden=true;load();};
+  $("#kGo").onclick=go;$("#kIn").addEventListener("keydown",function(e){if(e.key==="Enter")go();});
+  setTimeout(function(){$("#kIn").focus();},50);
+}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tabbar button").forEach(function(b){b.onclick=function(){
+  document.querySelectorAll(".tabbar button").forEach(function(x){x.setAttribute("aria-selected",String(x===b));});
+  document.querySelectorAll("main section").forEach(function(s){s.hidden=s.id!=="tab-"+b.dataset.tab;});
+  L.lsSet("lt-teacher-tab",b.dataset.tab);window.scrollTo(0,0);
+};});
+
+/* ---------- helpers ---------- */
+function dateLabel(s){if(!s)return "";var d=L.parseYmd(s);return L.DAYS[L.dow(d)]+" "+L.shortDate(d);}
+function confirmDel(btn,fn){btn.onclick=function(){if(btn.dataset.sure!=="1"){btn.dataset.sure="1";btn.textContent="Varmasti?";setTimeout(function(){btn.dataset.sure="";btn.textContent="Poista";},3000);return;}fn();};}
+function itemRow(icon,iconBg,text,meta,onEdit,onDel){
+  var d=document.createElement("div");d.className="item";
+  d.innerHTML='<div class="chip" style="background:'+iconBg+'">'+icon+'</div><div><div class="t">'+text+'</div><div class="m">'+meta+'</div></div>'+
+    '<div class="b"><button class="btn small" type="button">Muokkaa</button><button class="btn small danger" type="button">Poista</button></div>';
+  var bs=d.querySelectorAll("button");bs[0].onclick=onEdit;confirmDel(bs[1],onDel);
+  return d;
+}
+function busy(btn,p){var t=btn.textContent;btn.disabled=true;btn.textContent="Tallennetaan…";p.then(function(){btn.disabled=false;btn.textContent=t;},function(){btn.disabled=false;btn.textContent=t;});return p;}
+
+/* ---------- notices ---------- */
+function renderNotices(){
+  var tk=L.ymd(today()),box=$("#ntList");box.innerHTML="";
+  var list=S.notices.filter(function(n){return !n.until||n.until>=tk;}).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  $("#ntCount").textContent=list.length?list.length+" näkyvissä":"";
+  if(!list.length)box.innerHTML='<p class="empty">Ei tiedotteita.</p>';
+  list.forEach(function(n){box.appendChild(itemRow(n.important==="1"?"❗":"📣","var(--accent-soft)",esc(n.text),(n.important==="1"?'<span class="imp">Tärkeä</span> · ':"")+(n.until?"näkyy "+dateLabel(n.until)+" asti":"näkyy toistaiseksi"),
+    function(){ED.nt=n;$("#ntText").value=n.text;$("#ntUntil").value=n.until||"";$("#ntImp").checked=n.important==="1";ntMode();$("#ntText").focus();},
+    function(){send({op:"delete",table:"notices",id:n.id},"Tiedote poistettu");}));});
+}
+function ntMode(){$("#ntSave").textContent=ED.nt?"Tallenna muutos":"Lisää tiedote";$("#ntCancel").hidden=!ED.nt;}
+function ntClear(){ED.nt=null;$("#ntText").value="";$("#ntUntil").value="";$("#ntImp").checked=false;ntMode();}
+$("#ntCancel").onclick=ntClear;
+$("#ntSave").onclick=function(){
+  var t=$("#ntText").value.trim();if(!t)return $("#ntText").focus();
+  var row={id:ED.nt?ED.nt.id:L.newId(),text:t,until:$("#ntUntil").value,important:$("#ntImp").checked?"1":"",ts:ED.nt?ED.nt.ts:Date.now()};
+  busy(this,send({op:"upsert",table:"notices",row:row},ED.nt?"Tiedote päivitetty":"Tiedote lisätty")).then(ntClear,function(){});
+};
+
+/* ---------- homework ---------- */
+function renderHomework(){
+  var tk=L.ymd(today()),box=$("#hwList");box.innerHTML="";
+  var list=S.homework.filter(function(h){return !h.due||h.due>=tk;}).sort(function(a,b){return (a.due||"9").localeCompare(b.due||"9");});
+  $("#hwCount").textContent=list.length?list.length+" kpl":"";
+  if(!list.length)box.innerHTML='<p class="empty">Ei läksyjä.</p>';
+  list.forEach(function(h){var s=L.subject(h.subject);box.appendChild(itemRow(s.icon,"var(--"+s.color+")","<b>"+esc(h.subject||"Läksy")+"</b> · "+esc(h.text),h.due?"mennessä "+dateLabel(h.due):"",
+    function(){ED.hw=h;$("#hwSubj").value=h.subject;$("#hwText").value=h.text;$("#hwDue").value=h.due||"";hwMode();$("#hwText").focus();},
+    function(){send({op:"delete",table:"homework",id:h.id},"Läksy poistettu");}));});
+}
+function hwMode(){$("#hwSave").textContent=ED.hw?"Tallenna muutos":"Lisää läksy";$("#hwCancel").hidden=!ED.hw;}
+function hwClear(){ED.hw=null;$("#hwSubj").value="";$("#hwText").value="";$("#hwDue").value=L.ymd(L.nextSchoolDate(S.settings,today(),false));hwMode();}
+$("#hwCancel").onclick=hwClear;
+$("#hwSubj").addEventListener("change",function(){
+  // ehdotetaan seuraavaa päivää, jona ainetta on lukujärjestyksessä
+  if(ED.hw)return;var v=this.value.trim().toLowerCase();if(!v)return;
+  for(var i=1;i<=14;i++){var d=L.addDays(today(),i);if(L.lessonsFor(S.settings,d).some(function(l){return l.subject.toLowerCase()===v;})){$("#hwDue").value=L.ymd(d);return;}}
+});
+$("#hwSave").onclick=function(){
+  var t=$("#hwText").value.trim();if(!t)return $("#hwText").focus();
+  var row={id:ED.hw?ED.hw.id:L.newId(),subject:$("#hwSubj").value.trim(),text:t,due:$("#hwDue").value,ts:ED.hw?ED.hw.ts:Date.now()};
+  busy(this,send({op:"upsert",table:"homework",row:row},ED.hw?"Läksy päivitetty":"Läksy lisätty")).then(hwClear,function(){});
+};
+
+/* ---------- events ---------- */
+function renderEvents(){
+  var tk=L.ymd(today()),box=$("#evList");box.innerHTML="";
+  var list=S.events.filter(function(e){return e.date>=tk;}).sort(function(a,b){return (a.date+(a.time||"")).localeCompare(b.date+(b.time||""));});
+  $("#evCount").textContent=list.length?list.length+" tulossa":"";
+  if(!list.length)box.innerHTML='<p class="empty">Ei tulevia tapahtumia.</p>';
+  list.forEach(function(e){box.appendChild(itemRow(e.countdown==="1"?"⏳":"📌","var(--accent-soft)",esc(e.text),dateLabel(e.date)+(e.time?" klo "+L.fmt(e.time):" · koko päivä"),
+    function(){ED.ev=e;$("#evText").value=e.text;$("#evDate").value=e.date;$("#evTime").value=e.time||"";$("#evCd").checked=e.countdown==="1";evMode();$("#evText").focus();},
+    function(){send({op:"delete",table:"events",id:e.id},"Tapahtuma poistettu");}));});
+}
+function evMode(){$("#evSave").textContent=ED.ev?"Tallenna muutos":"Lisää tapahtuma";$("#evCancel").hidden=!ED.ev;}
+function evClear(){ED.ev=null;$("#evText").value="";$("#evTime").value="";$("#evCd").checked=false;$("#evDate").value=L.ymd(today());evMode();}
+$("#evCancel").onclick=evClear;
+$("#evSave").onclick=function(){
+  var t=$("#evText").value.trim(),d=$("#evDate").value;if(!t)return $("#evText").focus();if(!d)return $("#evDate").focus();
+  var row={id:ED.ev?ED.ev.id:L.newId(),date:d,time:$("#evTime").value,text:t,countdown:$("#evCd").checked?"1":"",ts:ED.ev?ED.ev.ts:Date.now()};
+  busy(this,send({op:"upsert",table:"events",row:row},ED.ev?"Tapahtuma päivitetty":"Tapahtuma lisätty")).then(evClear,function(){});
+};
+
+/* ---------- teaching mode ---------- */
+function lessonById(id){for(var i=0;i<S.lessons.length;i++)if(S.lessons[i].id===id)return S.lessons[i];return null;}
+function renderTeachCtl(){
+  var t=S.teach,on=!!t.on,c=lessonById(t.lessonId);
+  $("#tcState").innerHTML=(on?"🟢 Päällä":"Pois päältä")+'<small>'+(on?"Taululla näkyy opetustila.":t.auto?"Kytkeytyy päälle oppituntien ajaksi.":"Taulu näyttää tavallisen näkymän.")+'</small>';
+  $("#tcToggle").textContent=on?"Kytke pois":"Kytke päälle";$("#tcToggle").classList.toggle("on",!on);$("#tcToggle").classList.toggle("primary",false);
+  $("#tcAuto").checked=!!t.auto;
+  $("#tcCard").innerHTML=c?'Taululla näkyvä kortti: <b>'+esc(c.title||c.subject)+'</b> <button class="btn small" type="button" id="tcClear">Poista kortti näkyvistä</button>':"Tehtäväkorttia ei ole valittu. Valitse alta tuntiohje ja paina Näytä.";
+  var cl=$("#tcClear");if(cl)cl.onclick=function(){sendTeach({lessonId:""},"Kortti poistettu näkyvistä");};
+}
+function sendTeach(patch,msg){var v={on:S.teach.on,lessonId:S.teach.lessonId,auto:S.teach.auto};for(var k in patch)v[k]=patch[k];return send({op:"teach",value:v},msg).catch(function(){});}
+$("#tcToggle").onclick=function(){busy(this,sendTeach({on:!S.teach.on},S.teach.on?"Opetustila pois":"Opetustila päällä"));};
+$("#tcAuto").onchange=function(){sendTeach({auto:this.checked},this.checked?"Automaattinen opetustila päällä":"Automaattinen opetustila pois");};
+
+var LSD={image:"",data:"",dirty:false};   // muokattavan ohjeen kuva: Drive-id tai uusi kuva
+function renderLessons(){
+  var box=$("#lsList");box.innerHTML="";
+  var list=S.lessons.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  $("#lsCount").textContent=list.length?list.length+" kpl":"";
+  if(!list.length)box.innerHTML='<p class="empty">Ei vielä tuntiohjeita. Tee ensimmäinen alla.</p>';
+  list.forEach(function(c){
+    var s=L.subject(c.subject),md=L.mode(c.mode),shown=S.teach.lessonId===c.id;
+    var d=document.createElement("div");d.className="item";
+    d.innerHTML='<div class="chip" style="background:var(--'+s.color+')">'+(c.subject?s.icon:"📋")+'</div><div><div class="t"><b>'+esc(c.title||c.subject||"Tuntiohje")+'</b>'+(shown?'<span class="showing">taululla</span>':"")+'</div><div class="m">'+
+      esc([c.subject,md.label,c.image?"📷 kuva":""].filter(Boolean).join(" · "))+'</div></div>'+
+      '<div class="b"><button class="btn small primary" type="button">'+(shown?"Näkyy":"Näytä")+'</button><button class="btn small" type="button">Muokkaa</button><button class="btn small danger" type="button">Poista</button></div>';
+    var bs=d.querySelectorAll("button");
+    bs[0].disabled=shown;bs[0].onclick=function(){busy(this,sendTeach({lessonId:c.id,on:true},"Näkyy nyt taululla"));};
+    bs[1].onclick=function(){lsEdit(c);};
+    confirmDel(bs[2],function(){send({op:"delete",table:"lessons",id:c.id},"Tuntiohje poistettu");if(ED.ls&&ED.ls.id===c.id)lsClear();});
+    box.appendChild(d);
+  });
+  if(!$("#lsMode").options.length)$("#lsMode").innerHTML=L.MODES.map(function(m){return '<option value="'+m[0]+'">'+(m[1]?m[1]+" ":"")+esc(m[2])+'</option>';}).join("");
+}
+function lsPreview(){
+  var p=$("#lsPreview");
+  if(LSD.data){p.innerHTML='<img alt="Valittu kuva" src="'+LSD.data+'"><button class="btn small danger" type="button" id="lsImgDel">Poista kuva</button>';}
+  else if(LSD.image){p.innerHTML='<span class="hint">Ladataan kuvaa…</span>';L.getImg(key(),LSD.image).then(function(src){if(LSD.image&&!LSD.data){p.innerHTML='<img alt="Tallennettu kuva" src="'+src+'"><button class="btn small danger" type="button" id="lsImgDel">Poista kuva</button>';bindImgDel();}}).catch(function(){p.innerHTML='<span class="hint">Kuvaa ei saatu ladattua.</span>';});}
+  else p.innerHTML="";
+  bindImgDel();
+}
+function bindImgDel(){var b=$("#lsImgDel");if(b)b.onclick=function(){LSD.image="";LSD.data="";LSD.dirty=true;lsPreview();};}
+$("#lsFile").onchange=function(){
+  var f=this.files&&this.files[0];if(!f)return;
+  L.resizeImage(f,1400).then(function(d){LSD.data=d;LSD.dirty=true;lsPreview();}).catch(function(){toast("Kuvaa ei voitu avata. Kokeile toista kuvaa.");});
+  this.value="";
+};
+function lsEdit(c){
+  ED.ls=c;$("#lsTitle").value=c.title||"";$("#lsSubj").value=c.subject||"";$("#lsMode").value=c.mode||"";$("#lsGoal").value=c.goal||"";
+  $("#lsSteps").value=c.steps||"";$("#lsExtra").value=c.extra||"";LSD={image:c.image||"",data:"",dirty:false};lsPreview();
+  $("#lsFormH").textContent="Muokkaa tuntiohjetta";$("#lsCancel").hidden=false;$("#lsForm").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function lsClear(){
+  ED.ls=null;["#lsTitle","#lsSubj","#lsGoal","#lsSteps","#lsExtra"].forEach(function(s){$(s).value="";});$("#lsMode").value="";
+  LSD={image:"",data:"",dirty:false};lsPreview();$("#lsFormH").textContent="Uusi tuntiohje";$("#lsCancel").hidden=true;
+}
+$("#lsCancel").onclick=lsClear;
+function lsSave(btn,show){
+  var title=$("#lsTitle").value.trim(),subj=$("#lsSubj").value.trim();
+  if(!title&&!subj)return $("#lsTitle").focus();
+  var row={id:ED.ls?ED.ls.id:L.newId(),title:title,subject:subj,goal:$("#lsGoal").value.trim(),mode:$("#lsMode").value,
+    steps:$("#lsSteps").value.trim(),extra:$("#lsExtra").value.trim(),image:LSD.image,ts:ED.ls?ED.ls.ts:Date.now()};
+  var p=(LSD.data?send({op:"img",data:LSD.data}).then(function(j){row.image=j.id||"";}):Promise.resolve())
+    .then(function(){return send({op:"upsert",table:"lessons",row:row},show?null:"Tuntiohje tallennettu");})
+    .then(function(){if(show)return sendTeach({lessonId:row.id,on:true},"Tallennettu ja näkyy taululla");})
+    .then(function(){lsClear();});
+  busy(btn,p).catch(function(){});
+}
+$("#lsSave").onclick=function(){lsSave(this,false);};
+$("#lsSaveShow").onclick=function(){lsSave(this,true);};
+
+function renderMood(){
+  var box=$("#mdList"),list=S.mood.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).slice(0,12);
+  if(!list.length){box.innerHTML='<p class="empty">Ei vielä tuloksia. Fiilismittari löytyy taululta: 😊 Fiilis.</p>';return;}
+  var cols=["var(--s4)","var(--s2)","var(--s3)","var(--s1)"],em=["😄","🙂","😐","🙁"];
+  box.innerHTML=list.map(function(r){
+    var c=[+r.c1||0,+r.c2||0,+r.c3||0,+r.c4||0],n=c[0]+c[1]+c[2]+c[3];if(!n)return "";
+    return '<div class="moodrow"><div><b>'+esc(r.lesson||"Tunti")+'</b> <span class="hint">· '+dateLabel(r.date)+' · '+n+' vastausta</span></div>'+
+      '<div class="moodbar">'+c.map(function(v,i){return v?'<i style="width:'+(v/n*100)+'%;background:'+cols[i]+'">'+em[i]+" "+v+'</i>':"";}).join("")+'</div></div>';
+  }).join("");
+}
+
+/* ---------- food ---------- */
+function fdMonday(){return L.addDays(L.monday(today()),fdWeek*7);}
+function renderFood(){
+  var m=fdMonday(),box=$("#fdDays");
+  $("#fdWeek").textContent="Viikko "+L.isoWeek(m)+" · "+L.shortDate(m)+"–"+L.shortDate(L.addDays(m,4));
+  var html="";
+  for(var i=0;i<5;i++){
+    var d=L.addDays(m,i),k=L.ymd(d),f=S.menu.filter(function(x){return x.id===k||x.date===k;})[0]||{};
+    html+='<div class="menuday"><div class="d">'+L.cap(L.DAYS[i])+'<small>'+L.shortDate(d)+'</small></div><div class="f">'+
+      '<input data-main="'+k+'" maxlength="120" placeholder="Pääruoka" value="'+esc(f.main||"")+'" aria-label="'+L.DAYS_LONG[i]+' pääruoka">'+
+      '<input data-veg="'+k+'" maxlength="120" placeholder="Kasvisruoka" value="'+esc(f.veg||"")+'" aria-label="'+L.DAYS_LONG[i]+' kasvisruoka"></div></div>';
+  }
+  box.innerHTML=html;
+}
+$("#fdPrev").onclick=function(){fdWeek--;renderFood();};
+$("#fdNext").onclick=function(){fdWeek++;renderFood();};
+$("#fdSave").onclick=function(){
+  var rows=[];document.querySelectorAll("[data-main]").forEach(function(el){var k=el.dataset.main,v=document.querySelector('[data-veg="'+k+'"]');
+    rows.push({id:k,date:k,main:el.value.trim(),veg:v.value.trim()});});
+  busy(this,send({op:"upsertMany",table:"menu",rows:rows},"Ruokalista tallennettu")).catch(function(){});
+};
+$("#fdParse").onclick=function(){
+  var txt=$("#fdPaste").value;if(!txt.trim())return $("#fdPaste").focus();
+  var re=/^\s*(maanantai|tiistai|keskiviikko|torstai|perjantai|ma|ti|ke|to|pe)\b[\s.,:]*(\d{1,2}\.\d{1,2}\.?(\d{2,4})?)?[\s:–-]*/i;
+  var names=["maanantai","tiistai","keskiviikko","torstai","perjantai"],cur=-1,days=[[],[],[],[],[]];
+  txt.split(/\r?\n/).forEach(function(line){
+    var m=line.match(re);
+    if(m){var w=m[1].toLowerCase();cur=names.findIndex(function(n){return n.indexOf(w)===0;});var rest=line.slice(m[0].length).trim();if(rest&&cur>=0)days[cur].push(rest);return;}
+    if(cur>=0&&line.trim())days[cur].push(line.trim());
+  });
+  var found=0,mon=fdMonday();
+  days.forEach(function(lines,i){
+    if(!lines.length)return;found++;
+    var k=L.ymd(L.addDays(mon,i)),main="",veg="";
+    lines.forEach(function(l){
+      if(/kasvis/i.test(l)&&!veg)veg=l.replace(/^\s*kasvis(ruoka|lounas|vaihtoehto)?\s*[:–-]?\s*/i,"");
+      else if(!main)main=l.replace(/^\s*(lounas|pääruoka)\s*[:–-]?\s*/i,"");
+    });
+    document.querySelector('[data-main="'+k+'"]').value=main;document.querySelector('[data-veg="'+k+'"]').value=veg;
+  });
+  toast(found?"Täytetty "+found+" päivää. Tarkista ja tallenna.":"Viikonpäiviä ei tunnistettu. Aloita rivit päivän nimellä, esim. Maanantai.");
+};
+
+/* ---------- timetable ---------- */
+function renderTT(){
+  var days=$("#ttDays");days.innerHTML="";
+  for(var i=0;i<5;i++)(function(i){var b=document.createElement("button");b.type="button";b.className="day";b.textContent=L.cap(L.DAYS[i]);
+    b.setAttribute("aria-pressed",String(i===ttDay));b.onclick=function(){collectTT();ttDay=i;renderTT();};days.appendChild(b);})(i);
+  var row=(S.settings.timetable||{})[ttDay]||[],box=$("#ttSlots");box.innerHTML="";
+  S.settings.bells.forEach(function(b,i){
+    var d=document.createElement("div");d.className="slot item";d.style.gridTemplateColumns="96px 1fr";
+    d.innerHTML='<div class="tm">'+(i+1)+'. tunti<small>'+L.fmt(b.start)+'–'+L.fmt(b.end)+'</small></div><input data-slot="'+i+'" list="subjects" maxlength="40" value="'+esc(row[i]||"")+'" placeholder="–" aria-label="'+(i+1)+'. tunti">';
+    box.appendChild(d);
+  });
+  var dl=$("#subjects"),set={};
+  L.SUBJECT_NAMES.forEach(function(n){set[n]=1;});
+  Object.keys(S.settings.timetable||{}).forEach(function(k){(S.settings.timetable[k]||[]).forEach(function(n){if(n)set[n]=1;});});
+  dl.innerHTML=Object.keys(set).sort().map(function(n){return '<option value="'+esc(n)+'">';}).join("");
+}
+var ttDraft=null;
+function collectTT(){
+  if(!ttDraft)ttDraft=L.clone(S.settings.timetable||{});
+  var arr=[];document.querySelectorAll("[data-slot]").forEach(function(el){arr[+el.dataset.slot]=el.value.trim();});
+  while(arr.length&&!arr[arr.length-1])arr.pop();
+  ttDraft[ttDay]=arr;S.settings.timetable=ttDraft;
+}
+$("#ttCopy").onclick=function(){
+  if(ttDay===0)return toast("Maanantaita edeltävää päivää ei ole.");
+  var prev=((S.settings.timetable||{})[ttDay-1])||[];
+  document.querySelectorAll("[data-slot]").forEach(function(el){el.value=prev[+el.dataset.slot]||"";});
+};
+$("#ttSave").onclick=function(){collectTT();var tt=ttDraft;ttDraft=null;busy(this,saveSettings({timetable:tt},"Lukujärjestys tallennettu")).catch(function(){});};
+
+function renderBells(){
+  if(!bellsDraft)bellsDraft=L.clone(S.settings.bells);
+  var box=$("#bells");box.innerHTML="";
+  bellsDraft.forEach(function(b,i){
+    var d=document.createElement("div");d.className="bell item";
+    d.innerHTML='<span class="nr">'+(i+1)+'.</span><input type="time" value="'+esc(b.start)+'" aria-label="'+(i+1)+'. tunti alkaa"><input type="time" value="'+esc(b.end)+'" aria-label="'+(i+1)+'. tunti päättyy"><button class="x" type="button" aria-label="Poista tunti">✕</button>';
+    var ins=d.querySelectorAll("input");ins[0].onchange=function(){b.start=this.value;bellsDirty=true;};ins[1].onchange=function(){b.end=this.value;bellsDirty=true;};
+    d.querySelector(".x").onclick=function(){bellsDraft.splice(i,1);bellsDirty=true;renderBells();};
+    box.appendChild(d);
+  });
+}
+$("#bellAdd").onclick=function(){
+  var last=bellsDraft[bellsDraft.length-1],s=last?L.toMin(last.end)+15:495;
+  function t(m){return L.pad(Math.floor(m/60)%24)+":"+L.pad(m%60);}
+  bellsDraft.push({start:t(s),end:t(s+45)});bellsDirty=true;renderBells();
+};
+$("#bellSave").onclick=function(){
+  var b=bellsDraft.filter(function(x){return x.start&&x.end&&L.toMin(x.end)>L.toMin(x.start);}).sort(function(a,c){return L.toMin(a.start)-L.toMin(c.start);});
+  if(b.length!==bellsDraft.length)toast("Tarkista kellonajat: lopun pitää olla alun jälkeen.");
+  var nb=b;bellsDraft=null;bellsDirty=false;busy(this,saveSettings({bells:nb},"Kellonajat tallennettu")).catch(function(){});
+};
+
+/* ---------- class ---------- */
+function renderClass(){
+  var st=S.settings;
+  $("#title").textContent="Luokan taulu"+(st.className?" · "+st.className:"");
+  if(document.activeElement!==$("#clName"))$("#clName").value=st.className||"";
+  if(document.activeElement!==$("#clStudents"))$("#clStudents").value=(st.students||[]).join("\n");
+  if(document.activeElement!==$("#clBdays"))$("#clBdays").value=st.birthdays||"";
+  if(document.activeElement!==$("#clHome"))$("#clHome").value=st.homeNotes||"";
+  $("#clVisual").checked=!!st.visual;
+  $("#dtSize").value=String((st.duty||{}).size||2);$("#dtMode").value=(st.duty||{}).mode==="day"?"day":"week";
+  var names=L.dutyFor(st,today());
+  $("#dtNow").innerHTML=names.length?names.map(function(n){return "<span>"+esc(n)+"</span>";}).join(""):'<p class="empty">Lisää ensin oppilaat.</p>';
+  $("#plNow").textContent="Nyt: "+(st.place||"–")+" ("+(+st.lat).toFixed(2)+", "+(+st.lon).toFixed(2)+")";
+}
+$("#clSave").onclick=function(){
+  var seen={},students=$("#clStudents").value.split(/\r?\n/).map(function(s){return s.trim().slice(0,24);}).filter(function(s){if(!s||seen[s])return false;seen[s]=1;return true;});
+  var duty=L.clone(S.settings.duty||{});duty.size=+$("#dtSize").value;duty.mode=$("#dtMode").value;
+  var bad=$("#clBdays").value.split(/\r?\n/).filter(function(l){return l.trim();}).length-L.birthdays({birthdays:$("#clBdays").value}).length;
+  if(bad>0)toast(bad+" syntymäpäiväriviä ei tunnistettu. Käytä muotoa Aino 14.3.");
+  busy(this,saveSettings({className:$("#clName").value.trim(),students:students,duty:duty,birthdays:$("#clBdays").value.trim(),homeNotes:$("#clHome").value.trim(),visual:$("#clVisual").checked},"Luokan tiedot tallennettu")).catch(function(){});
+};
+function shiftDuty(n){var duty=L.clone(S.settings.duty||{});duty.offset=(+duty.offset||0)+n;saveSettings({duty:duty},"Järjestäjävuoro siirretty").catch(function(){});}
+$("#dtFwd").onclick=function(){shiftDuty(1);};
+$("#dtBack").onclick=function(){shiftDuty(-1);};
+
+var plT=null;
+$("#plSearch").addEventListener("input",function(){
+  var q=this.value.trim();clearTimeout(plT);if(q.length<2){$("#plResults").innerHTML="";return;}
+  plT=setTimeout(function(){
+    fetch("https://geocoding-api.open-meteo.com/v1/search?count=5&language=fi&name="+encodeURIComponent(q)).then(function(r){return r.json();}).then(function(j){
+      var box=$("#plResults");box.innerHTML="";
+      (j.results||[]).forEach(function(p){var b=document.createElement("button");b.type="button";b.className="btn";b.style.justifyContent="flex-start";
+        b.textContent=p.name+(p.admin1?", "+p.admin1:"")+(p.country_code&&p.country_code!=="FI"?" ("+p.country_code+")":"");
+        b.onclick=function(){saveSettings({place:p.name,lat:+p.latitude.toFixed(4),lon:+p.longitude.toFixed(4)},"Sään paikkakunta: "+p.name).then(function(){$("#plSearch").value="";box.innerHTML="";}).catch(function(){});};
+        box.appendChild(b);});
+      if(!box.children.length)box.innerHTML='<p class="hint">Ei tuloksia.</p>';
+    }).catch(function(){$("#plResults").innerHTML='<p class="hint">Haku ei onnistunut.</p>';});
+  },350);
+});
+$("#forget").onclick=function(){L.lsSet("lt-teacher-key","");askKey();};
+
+/* ---------- render ---------- */
+function renderAll(){
+  renderNotices();renderHomework();renderEvents();renderTeachCtl();renderLessons();renderMood();
+  if(!document.activeElement||!document.activeElement.matches("#fdDays input"))renderFood();
+  if(!ttDraft)renderTT();
+  if(!bellsDirty)bellsDraft=null;renderBells();renderClass();
+  if(!$("#hwDue").value)$("#hwDue").value=L.ymd(L.nextSchoolDate(S.settings,today(),false));
+  if(!$("#evDate").value)$("#evDate").value=L.ymd(today());
+  banner(!Object.keys(S.settings.timetable||{}).length&&S.loaded?"Aloita lisäämällä lukujärjestys Lukkari-välilehdeltä ja oppilaat Luokka-välilehdeltä.":"");
+}
+
+/* ---------- start ---------- */
+var tab=L.lsGet("lt-teacher-tab","info"),tb=document.querySelector('.tabbar [data-tab="'+tab+'"]');if(tb)tb.click();
+renderAll();load();
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&key()&&!ED.nt&&!ED.hw&&!ED.ev&&!ED.ls&&!LSD.dirty)load();});
+})();
+</script>
+</body>
+</html>
